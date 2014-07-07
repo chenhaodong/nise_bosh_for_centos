@@ -24,9 +24,10 @@ libxslt libxslt-devel zip unzip nfs-utils flex psmisc iptables sysstat rsync ope
 traceroute ncurses-libs quota libaio gdb tripwire libyaml-devel
 
 # stemcell_builder/stages/bosh_monit/apply.sh
-DEBIAN_FRONTEND=noninteractive apt-get install -o Dpkg::Options::="--force-confnew" -f -y \
---force-yes --no-install-recommends runit
+#DEBIAN_FRONTEND=noninteractive apt-get install -o Dpkg::Options::="--force-confnew" -f -y \
+#--force-yes --no-install-recommends runit
 
+yum install -y gcc gcc-c++ quota glibc-static readline-devel
 mkdir -p /package
 chmod 1755 /package
 
@@ -57,12 +58,12 @@ EOF
 
 # stemcell_builder/stages/bosh_users/apply.sh
 if [ `cat /etc/passwd | cut -f1 -d ":" | grep "^work$" -c` -eq 0 ]; then
-    addgroup --system work
-    adduser --disabled-password --gecos Ubuntu work
+    groupadd --system work
+    useradd -g work work
 
-    for grp in work adm audio cdrom dialout floppy video plugdev dip
+    for grp in work adm audio cdrom dialout floppy video dip
     do
-        adduser work $grp
+        usermod -a -G $grp work
     done
 else
     echo "User work exists already, skippking adduser..."
